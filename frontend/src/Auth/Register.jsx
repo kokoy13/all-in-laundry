@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
 export default function Register() {
@@ -11,6 +11,16 @@ export default function Register() {
         password: "",
         confirmPassword: "",
     })
+
+    const token = localStorage.getItem("token")
+    const userId = localStorage.getItem("id")
+    const role = localStorage.getItem("role")
+
+    useEffect(() => {
+        if(token && userId && role){
+            navigate(-1)
+        }
+    },)
 
     const handleChange = (e) => {
         const { name, value } = e.target

@@ -9,14 +9,17 @@ export default function Dashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true)
     const token = localStorage.getItem("token")
     const userId = localStorage.getItem("id")
+    const role = localStorage.getItem("role")
     const navigate = useNavigate()
-    
     useEffect(() => {
         if(!token && !userId){
             navigate('/login')
         }
-    })
 
+        if(role !== 'admin'){
+            navigate(-1)
+        }
+    })
     return (
         <div className="flex h-screen bg-white">
             <DashboardSidebar open={sidebarOpen} />

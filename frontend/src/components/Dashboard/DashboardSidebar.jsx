@@ -17,6 +17,7 @@ export default function DashboardSidebar({ open }) {
   const handleLogout = () =>{
     localStorage.removeItem('token')
     localStorage.removeItem('id')
+    localStorage.removeItem('role')
 
     navigate('/')
   }
@@ -55,7 +56,7 @@ export default function DashboardSidebar({ open }) {
               <LogOut />
             </span>
             {open && <span>Logout</span>}
-          </button>
+        </button>
       </div>
     </aside>
   )

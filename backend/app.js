@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./src/routes/authRoutes");
+const reservationRoutes = require("./src/routes/reservationRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -9,5 +10,6 @@ app.use(express.json());
 
 // Endpoint login
 app.use("/auth", authRoutes);
+app.use("/reservation", reservationRoutes);
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));

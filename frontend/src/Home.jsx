@@ -9,6 +9,7 @@ import Testimonials from "./components/Testimonials"
 import WhyChoose from "./components/WhyChoose"
 
 export default function Home() {
+
   return (
     <div className="min-h-screen bg-white">
       <Header/>

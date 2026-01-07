@@ -3,38 +3,50 @@ import { MapPin, Shirt } from "lucide-react"
 import Header from "./components/Header"
 import Footer from "./components/Footer"
 import { useNavigate } from "react-router-dom"
-
-const SERVICES = [
-    { id: 1, name: "Cuci Biasa", price: 5000, duration: "3-5 hari", desc: "Pencucian standar dengan deterjen" },
-    { id: 2, name: "Cuci Express", price: 12000, duration: "3 jam", desc: "Layanan kilat untuk kebutuhan mendesak" },
-    {
-        id: 3,
-        name: "Cuci Dry Clean",
-        price: 20000,
-        duration: "2-3 hari",
-        desc: "Untuk pakaian yang memerlukan perawatan khusus",
-    },
-    { id: 4, name: "Cuci Setrika", price: 15000, duration: "2-3 hari", desc: "Cuci dan setrika lengkap" },
-]
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function Reservation() {
     const token = localStorage.getItem("token")
     const userId = localStorage.getItem("id")
     const navigate = useNavigate()
-    
+    const [services, setServices] = useState([])
+    const [loading, setLoading] = useState(false)
+
     useEffect(() => {
         if(!token && !userId){
             navigate('/login')
         }
-    })
+    }, [token, userId, navigate])
+
+    useEffect(() => {
+        const fetchService = async () => {
+            try {
+                const res = await fetch(
+                    "http://localhost:5001/reservation/getallservice",
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                )
+
+                const data = await res.json()
+                setServices(data.services)
+            } catch (error) {
+                console.error(error.message)
+            }
+        }
+
+        fetchService()
+    }, [])
 
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
         address: "",
-        service: "",
-        date: "",
-        time: "",
+        service_id: "",
+        total_amount: "",
         quantity: "1",
         notes: "",
     })
@@ -48,33 +60,85 @@ export default function Reservation() {
 
     const handleServiceSelect = (service) => {
         setSelectedService(service)
-        setFormData((prev) => ({ ...prev, service: service.name }))
+        setFormData((prev) => ({ ...prev, service_id: service.id }))
     }
 
-    const calculateTotal = () => {
-        if (!selectedService) return 0
-        return selectedService.price * Number.parseInt(formData.quantity || 1)
-    }
+    useEffect(() => {
+        if (!selectedService) return
 
-    const handleSubmit = (e) => {
+        const total_amount =
+            selectedService.price * Number.parseInt(formData.quantity || 1)
+
+        setFormData(prev => ({
+            ...prev,
+            total_amount
+        }))
+    }, [selectedService, formData.quantity])
+
+
+    const handleSubmit = async(e) => {
         e.preventDefault()
-        // Send to WhatsApp
-        const message = `Halo, saya ingin melakukan reservasi:\n\nNama: ${formData.name}\nHP: ${formData.phone}\nAlamat: ${formData.address}\nLayanan: ${formData.service}\nTanggal: ${formData.date}\nJam: ${formData.time}\nJumlah: ${formData.quantity} kg\nCatatan: ${formData.notes}`
-        const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`
-        window.open(whatsappUrl, "_blank")
+        setLoading(true)
+        try { 
+            const res = await fetch("http://localhost:5001/reservation/create",{
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({formData, userId})
+            })
+
+            await new Promise(resolve => setTimeout(resolve, 500))
+
+            const data = await res.json();
+
+            if(!res.ok){
+                toast.error(data.message, {
+                    duration: 3000,
+                    position: 'top-center',
+                    removeDelay: 1000,
+                })
+                return
+            }
+            toast.success(data.message, {
+                duration: 3000,
+                position: 'top-center',
+                removeDelay: 1000,
+            })
+
+            // Send to WhatsApp
+            setTimeout(() => {
+                const message = `Halo, saya ingin melakukan reservasi:\n\nNama: ${formData.name}\nHP: ${formData.phone}\nAlamat: ${formData.address}\nLayanan: ${selectedService.name}\nJumlah: ${formData.quantity} kg\nCatatan: ${formData.notes}`
+                const whatsappUrl = `https://wa.me/6282169056949?text=${encodeURIComponent(message)}`
+                window.open(whatsappUrl, "_blank")
+            }, 3000);
+
+            setTimeout(() => {
+                navigate('/')
+            }, 4000);
+
+        } catch (error) {
+            setLoading(false)
+            toast.error(`Error: ${error}`, {
+                duration: 3000,
+                position: 'top-center',
+                removeDelay: 1000,
+            })
+        }finally{
+            setLoading(false)
+        }
     }
 
     return (
         <div className="flex flex-col min-h-screen bg-background text-foreground">
-        <Header />
-
+        <Toaster/>
+        <Header/>
+        
         <main className="grow bg-linear-to-br from-secondary/30 to-background py-12">
             <div className="max-w-6xl mx-auto px-4">
             {/* Header */}
             <div className="mb-12">
                 <h1 className="text-4xl font-bold mb-2">Pesan Layanan Cuci Anda</h1>
                 <p className="text-muted-foreground text-lg">
-                Isi form di bawah untuk membuat reservasi dengan Chingu Laundry
+                Isi form di bawah untuk membuat reservasi dengan All In Laundry
                 </p>
             </div>
 
@@ -135,24 +199,24 @@ export default function Reservation() {
                     <div className="bg-card rounded-lg p-6 border border-border">
                     <h2 className="text-xl font-semibold mb-4">Pilih Layanan</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {SERVICES.map((service) => (
+                        {services.map((service) => (
                         <button
                             key={service.id}
                             type="button"
                             onClick={() => handleServiceSelect(service)}
-                            className={`p-4 rounded-lg border-2 transition-all text-left ${
+                            className={`p-4 rounded-lg border-2 transition-all text-left hover:scale-105 cursor-pointer hover:bg-blue-500/80 duration-200 ${
                             selectedService?.id === service.id
-                                ? "border-chart-1 bg-chart-1/5"
+                                ? "border-chart-1 bg-chart-1/5 scale-105 bg-blue-500/80"
                                 : "border-border hover:border-chart-1/50"
                             }`}
                         >
                             <h3 className="font-semibold">{service.name}</h3>
-                            <p className="text-sm text-muted-foreground mt-1">{service.desc}</p>
+                            <p className="text-sm text-muted-foreground mt-1">{service.description}</p>
                             <div className="flex justify-between items-center mt-2">
                             <span className="text-sm text-chart-1 font-semibold">
                                 Rp {service.price.toLocaleString()}
                             </span>
-                            <span className="text-xs text-muted-foreground">{service.duration}</span>
+                            <span className="text-xs text-muted-foreground">{service.estimation}</span>
                             </div>
                         </button>
                         ))}
@@ -188,20 +252,30 @@ export default function Reservation() {
                     </div>
                     </div>
 
-                    <button
-                    type="submit"
-                    disabled={
-                        !selectedService ||
-                        !formData.name ||
-                        !formData.phone ||
-                        !formData.address ||
-                        !formData.date ||
-                        !formData.time
-                    }
-                    className="w-full bg-chart-1 hover:bg-chart-1/90 text-primary-foreground font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                    Pesan via WhatsApp
-                    </button>
+                    <div className="flex w-full justify-center">
+                        <button
+                        type="submit"
+                        disabled={
+                            !selectedService ||
+                            !formData.name ||
+                            !formData.phone ||
+                            !formData.address || !formData.quantity
+                        }
+                        className={`cursor-pointer hover:bg-green-500/70 duration-200 text-neutral-100 w-max bg-chart-1 hover:bg-chart-1/90 text-primary-foreground font-semibold py-3 px-6 rounded-lg transition-colors disabled:bg-green-500/70 disabled:cursor-not-allowed ${loading ? "bg-green-500/70":"bg-green-500"}`}
+                        >
+                            {
+                                loading ? (
+                                    <>
+                                        Memesan ...
+                                    </>
+                                ):(
+                                    <>
+                                        Pesan via WhatsApp
+                                    </>
+                                )
+                            }
+                        </button>
+                    </div>
                 </form>
                 </div>
 
@@ -215,7 +289,7 @@ export default function Reservation() {
                         <div className="pb-4 border-b border-border">
                         <p className="text-sm text-muted-foreground">Layanan</p>
                         <p className="font-semibold text-lg">{selectedService.name}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{selectedService.desc}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{selectedService.description}</p>
                         </div>
 
                         <div className="pb-4 border-b border-border">
@@ -230,12 +304,12 @@ export default function Reservation() {
 
                         <div className="pb-4 border-b border-border">
                         <p className="text-sm text-muted-foreground">Estimasi Selesai</p>
-                        <p className="font-semibold">{selectedService.duration}</p>
+                        <p className="font-semibold">{selectedService.estimation}</p>
                         </div>
 
                         <div className="pt-4">
                         <p className="text-sm text-muted-foreground mb-2">Total</p>
-                        <p className="text-3xl font-bold text-chart-1">Rp {calculateTotal().toLocaleString()}</p>
+                        <p className="text-3xl font-bold text-chart-1">Rp {(formData.total_amount ?? 0).toLocaleString()}</p>
                         <p className="text-xs text-muted-foreground mt-2">Pembayaran saat barang diambil</p>
                         </div>
                     </div>

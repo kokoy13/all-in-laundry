@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import logo from "/img/laundry.png"
 import { Link, useNavigate } from "react-router-dom"
 
@@ -9,7 +9,15 @@ export default function Login() {
         email: "",
         password: "",
     })
+    const token = localStorage.getItem("token")
+    const userId = localStorage.getItem("id")
     const navigate = useNavigate()
+
+    useEffect(() => {
+        if(token && userId){
+            navigate(-1)
+        }
+    },)
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -29,16 +37,24 @@ export default function Login() {
                 body: JSON.stringify(formData)
             })
 
-            if(res.ok){
-                setTimeout(()=>{
-                navigate('/dashboard')
-                , 3000})
+            const data = await res.json();
+
+            if(!res.ok){
+                setMessage(data.message || 'Login Gagal')
+                return
             }
 
-            const data = await res.json()
-            localStorage.setItem("token", data.token)
-            localStorage.setItem("id", data.id)
-            setMessage(data.message)
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("id", data.id);
+            localStorage.setItem("role", data.role)
+
+            setMessage(data.message);
+
+            if (data.role === "admin") {
+                navigate("/dashboard");
+            } else {
+                navigate("/");
+            }
 
         } catch (error) {
             setLoading(false)
@@ -49,7 +65,7 @@ export default function Login() {
     }
 
     return (
-        <section className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center px-4">
+        <section className="min-h-screen bg-linear-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center px-4">
             <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8">
                 
                 {/* Header */}
@@ -67,61 +83,61 @@ export default function Login() {
 
                 {/* Form */}
                 <form onSubmit={handleLogin} className="space-y-5">
-                <div>
-                    <label className="text-sm font-medium text-gray-700">
-                        Email
-                    </label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        placeholder="email@example.com"
-                        className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                    />
-                </div>
+                    <div>
+                        <label className="text-sm font-medium text-gray-700">
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                            placeholder="email@example.com"
+                            className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        />
+                    </div>
 
-                <div>
-                    <label className="text-sm font-medium text-gray-700">
-                        Password
-                    </label>
-                    <input
-                        type="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        name="password"
-                        required
-                        placeholder="••••••••"
-                        className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                    />
-                </div>
+                    <div>
+                        <label className="text-sm font-medium text-gray-700">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            name="password"
+                            required
+                            placeholder="••••••••"
+                            className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        />
+                    </div>
 
-                <button
-                    type="submit"
-                    className={`w-full cursor-pointer bg-linear-to-r from-blue-600 to-blue-500 text-white py-3 rounded-xl font-semibold text-lg shadow-md transition ${loading? "hover:opacity-90":"hover:opacity-100"}`}
-                >
+                    <button
+                        type="submit"
+                        className={`w-full cursor-pointer bg-linear-to-r from-blue-600 to-blue-500 text-white py-3 rounded-xl font-semibold text-lg shadow-md transition ${loading? "opacity-100":"hover:opacity-100"}`}
+                    >
+                        {
+                            loading?
+                            (
+                                <>
+                                    Loading...
+                                </>
+                            ):(
+                                <>
+                                    Login
+                                </>
+                            )
+                        }
+                    </button>
                     {
-                        loading?
+                        message &&  
                         (
-                            <>
-                                Loading...
-                            </>
-                        ):(
-                            <>
-                                Login
-                            </>
+                            <div className="text-sm text-center text-red-500 pl-2 pt-2">
+                                {message}
+                            </div>
                         )
                     }
-                </button>
-                {
-                    message &&  
-                    (
-                        <div className="text-sm text-center text-red-500 pl-2 pt-2">
-                            {message}
-                        </div>
-                    )
-                }
                 </form>
 
                 {/* Footer */}

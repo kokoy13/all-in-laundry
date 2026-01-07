@@ -10,6 +10,7 @@ import StatisticsPage from './Dashboard/Statistics/Page'
 import Login from './Auth/Login'
 import Register from './Auth/Register'
 import Reservation from './Reservation'
+import CheckOrder from './CheckOrder'
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
   {
     path: "/reservation",
     element: <Reservation/>
+  },
+  {
+    path: "/check-order",
+    element: <CheckOrder/>
   },
 ])
 

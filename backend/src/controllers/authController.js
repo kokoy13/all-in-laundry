@@ -68,10 +68,12 @@ exports.login = async(req , res) =>{
             })
         }
         const token = await bcrypt.hash(existingUser[0][0].password, 10);
+        const role = existingUser[0][0].role
 
         return res.status(200).json({
             message: "",
-            token: token,
+            token,
+            role,
             id: existingUser[0][0].id
         })
     } catch (error) {
