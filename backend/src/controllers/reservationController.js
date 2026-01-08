@@ -40,3 +40,18 @@ exports.getAllService = async(req, res) =>{
         })
     }
 }
+
+exports.getOrderByUserId = async(req, res) =>{
+    const {userId} = req.query
+
+    try {
+        const orders = await Reservation.getOrderByUserId(userId)
+        return res.status(200).json({
+            orders: orders
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: `Error gan: ${error}`
+        })
+    }
+}

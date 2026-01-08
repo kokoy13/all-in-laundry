@@ -9,6 +9,11 @@ class Reservation{
         const [rows] = await db.query("SELECT * FROM services");
         return rows
     } 
+
+    static async getOrderByUserId(userId){
+        const [rows] = await db.query("SELECT * FROM orders WHERE user_id = ?", [userId])
+        return rows
+    }
 }
 
 module.exports = Reservation
