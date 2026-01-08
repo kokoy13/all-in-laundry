@@ -45,13 +45,11 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
   const getStatusColor = (status) => {
     switch (status) {
       case "completed":
-        return "bg-green-500/20 text-green-300 border-green-500/30"
-      case "in-progress":
-        return "bg-blue-500/20 text-blue-300 border-blue-500/30"
-      case "pending":
-        return "bg-yellow-500/20 text-yellow-300 border-yellow-500/30"
+        return "bg-green-50 text-green-600 border-green-600"
+      case "progress":
+        return "bg-blue-50 text-blue-600 border-blue-600"
       case "cancelled":
-        return "bg-red-500/20 text-red-300 border-red-500/30"
+        return "bg-red-50 text-red-600 border-red-600"
       default:
         return "bg-slate-700/20 text-slate-300"
     }
@@ -99,11 +97,7 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
                 <td className="px-6 py-5 text-sm">
                   <span
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                      order.status === "completed"
-                        ? "bg-gray-100 text-gray-700"
-                        : order.status === "progress"
-                          ? "bg-blue-50 text-blue-700"
-                          : "bg-gray-100 text-gray-600"
+                      getStatusColor(order.status)
                     }`}
                   >
                     <span className="text-xs">{getStatusIcon(order.status)}</span>
@@ -112,8 +106,8 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
                 </td>
                 <td className="px-6 flex gap-2 items-center py-5 text-sm">
                     <button className="hover:underline font-semibold cursor-pointer">View</button>
-                    <button className="hover:underline font-semibold cursor-pointer">Edit</button>
-                    <button className="hover:underline font-semibold cursor-pointer">Delete</button>
+                    <button className="hover:underline font-semibold cursor-pointer text-blue-500">Edit</button>
+                    <button className="hover:underline font-semibold cursor-pointer text-red-500">Delete</button>
                 </td>
               </tr>
             ))}

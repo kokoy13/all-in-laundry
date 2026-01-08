@@ -16,7 +16,7 @@ export default function DashboardHeader({ onMenuClick }) {
               <Home width="18"/>
             </span>
             <span className="text-sm">Back to Home</span>
-        </Link>
+      </Link>
     </header>
   )
 }

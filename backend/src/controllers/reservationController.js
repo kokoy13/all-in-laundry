@@ -29,7 +29,7 @@ exports.getAllService = async(req, res) =>{
     try {
         const services = await Reservation.getAllService()
         return res.status(200).json({
-            services: services
+            services: services[0]
         })
     } catch (error) {
         return res.status(400).json({

@@ -6,8 +6,7 @@ class Reservation{
     }
 
     static async getAllService(){
-        const [rows] = await db.query("SELECT * FROM services");
-        return rows
+        return await db.query("SELECT * FROM services ORDER BY id");
     } 
 
     static async getOrderByUserId(userId){

@@ -57,7 +57,7 @@ export default function DashboardSidebar({ open, activeMenu, setActiveMenu }) {
     >
       <div className="p-6">
         <h2 className={`font-semibold text-white text-lg ${!open && "text-center"}`}>
-          {open ? "ALL IN LAUNDRY" : "🧺"}
+          {open ? "ALL IN LAUNDRY" : "AI"}
         </h2>
       </div>
 
