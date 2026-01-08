@@ -6,5 +6,6 @@ router.get("/getoverview", dashboardController.index);
 router.get("/getallorder", dashboardController.getAllOrder);
 router.get("/getallcustomer", dashboardController.getAllCustomer);
 router.get("/getallservice", dashboardController.getAllService);
+router.get("/getalltransaction", dashboardController.getAllTransaction)
 
 module.exports = router;

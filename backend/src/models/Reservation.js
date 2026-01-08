@@ -5,6 +5,10 @@ class Reservation{
         return await db.query("INSERT INTO orders (user_id, service_id, name, phone, address, quantity, total_amount, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [user_id, service_id, name, phone, address, quantity, total_amount, notes])
     }
 
+    static async getAllTransaction(){
+        return await db.query("SELECT * FROM transactions ORDER BY id");
+    } 
+
     static async getAllService(){
         return await db.query("SELECT * FROM services ORDER BY id");
     } 

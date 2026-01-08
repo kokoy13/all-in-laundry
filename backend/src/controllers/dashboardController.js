@@ -35,6 +35,19 @@ exports.getAllOrder = async(req, res) =>{
     }
 }
 
+exports.getAllTransaction = async(req, res)=>{
+    try {
+        const transactions = await Reservation.getAllTransaction()
+        return res.status(200).json({
+            transactions: transactions[0],
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: `Error ${error}`
+        })
+    }
+}
+
 exports.getAllService = async(req, res) =>{
     try {
         const services = await Reservation.getAllService()

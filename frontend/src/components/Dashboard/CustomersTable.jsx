@@ -52,7 +52,7 @@ export default function CustomersTable({ searchQuery, customers }) {
           </thead>
           <tbody className="divide-y divide-slate-700">
             {paginatedCustomers.map((customer) => (
-              <tr key={customer.id} className="hover:bg-gray-200 transition-colors duration-200">
+              <tr key={customer.id} className="hover:bg-gray-200 border-gray-200 transition-colors duration-200">
                 <td className="px-6 py-4">
                   <div className="text-sm font-semibold">{customer.id}</div>
                 </td>

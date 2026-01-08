@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 import {
   ChartNoAxesGantt,
@@ -46,8 +46,12 @@ const menuItems = [
 
 export default function DashboardSidebar({ open, activeMenu, setActiveMenu }) {
 
+  const navigate = useNavigate()
+
   const handleLogout = () => {
-    localStorage.clear()
+    localStorage.removeItem("token")
+    localStorage.removeItem("id")
+    localStorage.removeItem("role")
     navigate("/")
   }
 
