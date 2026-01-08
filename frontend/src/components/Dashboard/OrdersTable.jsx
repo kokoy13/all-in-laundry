@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { useState } from "react"
+import { Check, X } from "lucide-react"
 
 export default function OrdersTable({ orders, filterStatus, searchQuery }) {
   const [currentPage, setCurrentPage] = useState(1)
@@ -55,6 +56,16 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
     }
   }
 
+  const handleClick = async(condition) =>{
+    if(condition === "approve"){
+      console.log("setuju")
+    }else if(condition === "disapprove"){
+      console.log("ndak setuju")
+    }else if(condition === "remove"){
+      console.log("hapus")
+    }
+  }
+
   return (
     <div className="rounded-lg overflow-hidden">
       <div className="overflow-x-auto">
@@ -105,9 +116,13 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
                   </span>
                 </td>
                 <td className="px-6 flex gap-2 items-center py-5 text-sm">
-                    <button className="hover:underline font-semibold cursor-pointer">View</button>
-                    <button className="hover:underline font-semibold cursor-pointer text-blue-500">Edit</button>
-                    <button className="hover:underline font-semibold cursor-pointer text-red-500">Delete</button>
+                    <button onClick={handleClick("approve")}  className="cursor-pointer">
+                      <Check className="w-5 h-5 text-green-500 hover:text-green-600"/>
+                    </button>
+                    <button onClick={handleClick("disapprove")} className="cursor-pointer">
+                      <X className="w-5 h-5 text-red-500 hover:text-red-600"/>
+                    </button>
+                    <button onClick={handleClick("remove")} className="hover:underline font-semibold cursor-pointer text-red-500">Delete</button>
                 </td>
               </tr>
             ))}

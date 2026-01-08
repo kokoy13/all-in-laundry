@@ -1,135 +1,89 @@
--- Chingu Laundry Management System Database Schema
--- Create database
-CREATE DATABASE IF NOT EXISTS chingu_laundry;
-USE chingu_laundry;
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Jan 08, 2026 at 11:45 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
--- Customers/Users Table
-CREATE TABLE IF NOT EXISTS customers (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  phone VARCHAR(20) UNIQUE NOT NULL,
-  email VARCHAR(100),
-  address VARCHAR(255),
-  city VARCHAR(50),
-  postal_code VARCHAR(10),
-  preferred_service VARCHAR(50),
-  total_orders INT DEFAULT 0,
-  total_spent DECIMAL(10, 2) DEFAULT 0,
-  loyalty_points INT DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_phone (phone),
-  INDEX idx_created_at (created_at)
-);
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
--- Services Table
-CREATE TABLE IF NOT EXISTS services (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  description TEXT,
-  base_price DECIMAL(10, 2) NOT NULL,
-  unit VARCHAR(20) DEFAULT 'kg',
-  processing_time_hours INT,
-  category ENUM('regular', 'express', 'dry_clean', 'special') DEFAULT 'regular',
-  is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_category (category)
-);
 
--- Orders Table
-CREATE TABLE IF NOT EXISTS orders (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  order_number VARCHAR(50) UNIQUE NOT NULL,
-  customer_id INT NOT NULL,
-  pickup_address VARCHAR(255),
-  delivery_address VARCHAR(255),
-  pickup_date DATETIME NOT NULL,
-  estimated_delivery DATETIME,
-  actual_delivery DATETIME,
-  status ENUM('pending', 'picked_up', 'in_progress', 'completed', 'cancelled') DEFAULT 'pending',
-  total_amount DECIMAL(10, 2),
-  payment_status ENUM('unpaid', 'partial', 'paid') DEFAULT 'unpaid',
-  payment_method ENUM('cash', 'transfer', 'card') DEFAULT 'cash',
-  notes TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
-  INDEX idx_status (status),
-  INDEX idx_customer_id (customer_id),
-  INDEX idx_pickup_date (pickup_date),
-  INDEX idx_order_number (order_number)
-);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
--- Order Items Table (Services in each order)
-CREATE TABLE IF NOT EXISTS order_items (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  order_id INT NOT NULL,
-  service_id INT NOT NULL,
-  quantity DECIMAL(5, 2) NOT NULL,
-  unit_price DECIMAL(10, 2) NOT NULL,
-  subtotal DECIMAL(10, 2) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-  FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE RESTRICT,
-  INDEX idx_order_id (order_id)
-);
+--
+-- Database: `laundry`
+--
 
--- Pricing Table (Different rates)
-CREATE TABLE IF NOT EXISTS pricing (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  service_id INT NOT NULL,
-  min_quantity DECIMAL(5, 2),
-  max_quantity DECIMAL(5, 2),
-  price_per_unit DECIMAL(10, 2) NOT NULL,
-  discount_percentage DECIMAL(5, 2) DEFAULT 0,
-  effective_from DATE,
-  effective_to DATE,
-  FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
-  INDEX idx_service_id (service_id)
-);
+-- --------------------------------------------------------
 
--- Transactions/Payments Table
-CREATE TABLE IF NOT EXISTS transactions (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  order_id INT NOT NULL,
-  amount DECIMAL(10, 2) NOT NULL,
-  payment_method ENUM('cash', 'transfer', 'card') NOT NULL,
-  transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  reference_number VARCHAR(100),
-  notes TEXT,
-  created_by VARCHAR(100),
-  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-  INDEX idx_order_id (order_id),
-  INDEX idx_transaction_date (transaction_date)
-);
+--
+-- Table structure for table `orders`
+--
 
--- Dashboard Statistics Table (for caching)
-CREATE TABLE IF NOT EXISTS daily_statistics (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  statistics_date DATE UNIQUE NOT NULL,
-  total_orders INT DEFAULT 0,
-  total_revenue DECIMAL(10, 2) DEFAULT 0,
-  completed_orders INT DEFAULT 0,
-  pending_orders INT DEFAULT 0,
-  new_customers INT DEFAULT 0,
-  average_order_value DECIMAL(10, 2) DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_date (statistics_date)
-);
+CREATE TABLE `orders` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `service_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `phone` varchar(255) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `status` enum('progress','completed','cancelled') NOT NULL DEFAULT 'progress',
+  `total_amount` int(11) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Insert Sample Services
-INSERT INTO services (name, description, base_price, unit, processing_time_hours, category) VALUES
-('Cuci Biasa', 'Layanan cuci standar dengan pengeringan', 8000, 'kg', 24, 'regular'),
-('Cuci Express', 'Layanan cuci cepat siap 3 jam', 12000, 'kg', 3, 'express'),
-('Dry Clean', 'Layanan dry cleaning untuk pakaian premium', 25000, 'piece', 24, 'dry_clean'),
-('Setrika', 'Layanan setrika profesional', 3000, 'piece', 2, 'special'),
-('Whitening', 'Pemutihan pakaian putih', 10000, 'kg', 24, 'special'),
-('Softener Premium', 'Pencuci dengan softener premium', 10000, 'kg', 24, 'special');
+--
+-- Dumping data for table `orders`
+--
 
--- Insert Sample Customer
-INSERT INTO customers (name, phone, email, address, city) VALUES
-('Budi Santoso', '081234567890', 'budi@example.com', 'Jl. Merdeka No. 123', 'Jakarta');
+INSERT INTO `orders` (`id`, `user_id`, `service_id`, `name`, `phone`, `address`, `quantity`, `status`, `total_amount`, `notes`, `created_at`, `updated_at`) VALUES
+(16, 11, 2, 'Tek Pan', '082169806800', 'Jalan jalan', 10, 'progress', 120000, '', '2026-01-08 10:31:12', '2026-01-08 10:31:12');
 
--- Commit changes
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_customer_id` (`user_id`),
+  ADD KEY `orders_ibfk_2` (`service_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE;
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
