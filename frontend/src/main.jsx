@@ -6,7 +6,8 @@ import Home from './Home'
 import Dashboard from './Dashboard/Dashboard'
 import CustomersPage from './Dashboard/Customers/Page'
 import OrdersPage from './Dashboard/Orders/Page'
-import StatisticsPage from './Dashboard/Statistics/Page'
+import ServicesPage from './Dashboard/Services/Page'
+import TransactionsPage from './Dashboard/Transactions/Page'
 import Login from './Auth/Login'
 import Register from './Auth/Register'
 import Reservation from './Reservation'
@@ -30,8 +31,12 @@ const router = createBrowserRouter([
     element: <OrdersPage />
   },
   {
-    path: "/dashboard/statistics",
-    element: <StatisticsPage />
+    path: "/dashboard/services",
+    element: <ServicesPage />
+  },
+  {
+    path: "/dashboard/transaction",
+    element: <TransactionsPage />
   },
   {
     path: "/login",

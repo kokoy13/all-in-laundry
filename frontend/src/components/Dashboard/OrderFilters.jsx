@@ -1,16 +1,13 @@
-"use client"
-
 export default function OrderFilters({ filterStatus, setFilterStatus, searchQuery, setSearchQuery }) {
   const statuses = [
     { value: "all", label: "All Orders" },
-    { value: "pending", label: "Pending" },
-    { value: "in-progress", label: "In Progress" },
+    { value: "progress", label: "Proses" },
     { value: "completed", label: "Completed" },
-    { value: "cancelled", label: "Cancelled" },
+    { value: "cancelled", label: "Cancel" },
   ]
 
   return (
-    <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg p-6 mb-6">
+    <div className="rounded-lg p-6 m-6 shadow-sm border border-gray-200">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1">
           <input
@@ -18,7 +15,7 @@ export default function OrderFilters({ filterStatus, setFilterStatus, searchQuer
             placeholder="Search by customer name, order ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-800 text-white placeholder-slate-500 px-4 py-2 rounded-lg border border-slate-700 focus:border-cyan-400 outline-none transition-colors"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 outline-none transition-colors"
           />
         </div>
 
@@ -27,10 +24,10 @@ export default function OrderFilters({ filterStatus, setFilterStatus, searchQuer
             <button
               key={status.value}
               onClick={() => setFilterStatus(status.value)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
+              className={`px-4 py-2 rounded-lg font-medium cursor-pointer transition-colors text-white whitespace-nowrap ${
                 filterStatus === status.value
-                  ? "bg-cyan-500 text-slate-950"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "bg-blue-500"
+                  : "bg-neutral-900 hover:bg-blue-500"
               }`}
             >
               {status.label}

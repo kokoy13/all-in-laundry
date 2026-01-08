@@ -14,6 +14,30 @@ class Reservation{
         const [rows] = await db.query("SELECT * FROM orders WHERE user_id = ?", [userId])
         return rows
     }
+
+    static async getTotalOrder(){
+        return await db.query("SELECT count(*) as total FROM orders ORDER BY id")
+    }
+
+    static async getAllOrder(){
+        return await db.query("SELECT * from orders ORDER BY id")
+    }
+
+    static async getTotalRevenue(){
+        return await db.query("SELECT count(total_amount) as total FROM orders WHERE status = 'completed' ORDER BY id")
+    }
+
+    static async getCompletedOrder(){
+        return await db.query("SELECT count(*) as total FROM orders WHERE status = 'completed' ORDER BY id")
+    }
+
+    static async getProgressOrder(){
+        return await db.query("SELECT count(*) as total FROM orders WHERE status = 'progress' ORDER BY id")
+    }
+
+    static async getRecentOrder(){
+        return await db.query("SELECT * FROM orders ORDER BY id DESC LIMIT 5")
+    }
 }
 
 module.exports = Reservation

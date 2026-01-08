@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"
 
 export default function CustomersPage() {
     const [sidebarOpen, setSidebarOpen] = useState(true)
+    const [activeMenu, setActiveMenu] = useState("customers")
     const [searchQuery, setSearchQuery] = useState("")
     const [filterSort, setFilterSort] = useState("recent")
     const token = localStorage.getItem("token")
@@ -20,7 +21,7 @@ export default function CustomersPage() {
 
     return (
         <div className="flex h-screen bg-slate-950">
-        <DashboardSidebar open={sidebarOpen} />
+        <DashboardSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} open={sidebarOpen} />
         <div className="flex-1 flex flex-col overflow-hidden">
             <DashboardHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
             <main className="flex-1 overflow-y-auto bg-slate-900 p-6">

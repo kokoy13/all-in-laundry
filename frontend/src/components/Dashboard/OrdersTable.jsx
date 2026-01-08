@@ -1,83 +1,46 @@
-"use client"
-
+import { useEffect } from "react"
 import { useState } from "react"
 
-export default function OrdersTable({ filterStatus, searchQuery }) {
-  const [orders] = useState([
-    {
-      id: "#001",
-      customer: "Budi Santoso",
-      phone: "081234567890",
-      service: "Cuci Express",
-      weight: "5 kg",
-      amount: "IDR 50,000",
-      status: "completed",
-      date: "Dec 28, 2024",
-      notes: "Express service - Ready for pickup",
-    },
-    {
-      id: "#002",
-      customer: "Siti Nurhaliza",
-      phone: "081987654321",
-      service: "Cuci Biasa",
-      weight: "8 kg",
-      amount: "IDR 35,000",
-      status: "in-progress",
-      date: "Dec 29, 2024",
-      notes: "Currently washing",
-    },
-    {
-      id: "#003",
-      customer: "Ahmad Wijaya",
-      phone: "082123456789",
-      service: "Dry Clean",
-      weight: "3 pieces",
-      amount: "IDR 75,000",
-      status: "pending",
-      date: "Dec 30, 2024",
-      notes: "Waiting for pickup",
-    },
-    {
-      id: "#004",
-      customer: "Rina Kusuma",
-      phone: "082456789012",
-      service: "Cuci Express",
-      weight: "4 kg",
-      amount: "IDR 50,000",
-      status: "completed",
-      date: "Dec 28, 2024",
-      notes: "Delivered to customer",
-    },
-    {
-      id: "#005",
-      customer: "Hendra Gunawan",
-      phone: "083567890123",
-      service: "Cuci Biasa",
-      weight: "6 kg",
-      amount: "IDR 40,000",
-      status: "in-progress",
-      date: "Dec 29, 2024",
-      notes: "In drying process",
-    },
-    {
-      id: "#006",
-      customer: "Dewi Lestari",
-      phone: "083456789012",
-      service: "Cuci Express",
-      weight: "7 kg",
-      amount: "IDR 50,000",
-      status: "cancelled",
-      date: "Dec 27, 2024",
-      notes: "Customer cancelled order",
-    },
-  ])
+export default function OrdersTable({ orders, filterStatus, searchQuery }) {
+  const [currentPage, setCurrentPage] = useState(1)
+  const recordsPerPage = 5
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "completed":
+        return "✓"
+      case "progress":
+        return "⟳"
+      default:
+        return "○"
+    }
+  }
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case "completed":
+        return "Completed"
+      case "progress":
+        return "In Progress"
+      default:
+        return status
+    }
+  }
 
   const filteredOrders = orders.filter((order) => {
     const matchesStatus = filterStatus === "all" || order.status === filterStatus
     const matchesSearch =
-      order.customer.toLowerCase().includes(searchQuery.toLowerCase()) || order.id.includes(searchQuery)
+      order.name.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesStatus && matchesSearch
   })
+
+  const totalPages = Math.ceil(filteredOrders.length / recordsPerPage)
+  const startIndex = (currentPage - 1) * recordsPerPage
+  const paginatedOrders = filteredOrders.slice(startIndex, startIndex + recordsPerPage)
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filterStatus, searchQuery])
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -94,51 +57,55 @@ export default function OrdersTable({ filterStatus, searchQuery }) {
     }
   }
 
-  const getStatusLabel = (status) => {
-    const labels = {
-      completed: "✓ Completed",
-      "in-progress": "⟳ In Progress",
-      pending: "⏳ Pending",
-      cancelled: "✕ Cancelled",
-    }
-    return labels[status] || status
-  }
-
   return (
-    <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg overflow-hidden">
+    <div className="rounded-lg overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-slate-900/50 border-b border-slate-700">
-            <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Order ID</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Customer</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Service</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Weight</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Amount</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Status</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Date</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Action</th>
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-100">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                Order ID
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                Customer
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                Service
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                Quantity
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                Amount
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                Status
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-700">
-            {filteredOrders.map((order) => (
-              <tr key={order.id} className="hover:bg-slate-800/50 transition-colors">
-                <td className="px-6 py-4 text-sm font-semibold text-cyan-400">{order.id}</td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-white font-medium">{order.customer}</div>
-                  <div className="text-xs text-slate-400">{order.phone}</div>
+          <tbody className="divide-y divide-gray-100">
+            {paginatedOrders  .map((order) => (
+              <tr key={order.id} className="hover:bg-gray-50/50 transition-colors duration-150">
+                <td className="px-6 py-5 text-sm font-medium text-gray-900">{order.id}</td>
+                <td className="px-6 py-5 text-sm text-gray-700">{order.name}</td>
+                <td className="px-6 py-5 text-sm text-gray-600">{order.service_id}</td>
+                <td className="px-6 py-5 text-sm font-medium text-gray-900">{order.quantity} Kg</td>
+                <td className="px-6 py-5 text-sm text-gray-900 font-semibold">
+                  Rp {order.total_amount.toLocaleString()}
                 </td>
-                <td className="px-6 py-4 text-sm text-slate-300">{order.service}</td>
-                <td className="px-6 py-4 text-sm text-white">{order.weight}</td>
-                <td className="px-6 py-4 text-sm font-semibold text-white">{order.amount}</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className={`px-3 py-1 rounded-lg text-xs font-semibold border ${getStatusColor(order.status)}`}>
+                <td className="px-6 py-5 text-sm">
+                  <span
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                      order.status === "completed"
+                        ? "bg-gray-100 text-gray-700"
+                        : order.status === "progress"
+                          ? "bg-blue-50 text-blue-700"
+                          : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    <span className="text-xs">{getStatusIcon(order.status)}</span>
                     {getStatusLabel(order.status)}
                   </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-slate-400">{order.date}</td>
-                <td className="px-6 py-4 text-sm">
-                  <button className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">View</button>
                 </td>
               </tr>
             ))}
@@ -149,6 +116,49 @@ export default function OrdersTable({ filterStatus, searchQuery }) {
       {filteredOrders.length === 0 && (
         <div className="p-12 text-center">
           <p className="text-slate-400 text-lg">No orders found</p>
+        </div>
+      )}
+
+      {filteredOrders.length > 0 && (
+        <div className="border-t border-gray-300 px-6 py-4 flex items-center justify-between">
+          <div className="text-sm text-neutral-900">
+            Showing {startIndex + 1}-{Math.min(startIndex + recordsPerPage, filteredOrders.length)} of{" "}
+            {filteredOrders.length} orders
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-lg border border-neutral-900 hover:border-blue-600 text-neutral-900 text-sm font-medium hover:bg-blue-500 hover:text-white cursor-pointer duration-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Previous
+            </button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                    currentPage === page
+                      ? "bg-blue-500 text-white border border-blue-600"
+                      : "border border-neutral-900 text-neutral-900 hover:text-white hover:border-blue-600 hover:bg-blue-500"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-lg border border-neutral-900 hover:border-blue-600 text-neutral-900 text-sm font-medium hover:bg-blue-500 hover:text-white cursor-pointer duration-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>

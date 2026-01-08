@@ -1,11 +1,8 @@
-const validator = require("validator")
-const bcrypt = require("bcrypt")
 const Reservation = require("../models/Reservation")
 
 
 exports.create = async(req, res) =>{
     const {formData, userId} = req.body
-    console.log(formData, userId)
     try {
         await Reservation.insertReservation(
             userId,
