@@ -34,3 +34,16 @@ exports.getAllOrder = async(req, res) =>{
         })
     }
 }
+
+exports.getAllCustomer = async(req, res) =>{
+    try {
+        const customers = await Reservation.getAllCustomer()
+        return res.status(200).json({
+            customers: customers[0],
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: `Error ${error}`
+        })
+    }
+}

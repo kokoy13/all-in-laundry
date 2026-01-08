@@ -13,16 +13,23 @@ export default function OrdersPage() {
     const [orders, setOrders] = useState([])
     const token = localStorage.getItem("token")
     const userId = localStorage.getItem("id")
+    const role = localStorage.getItem("role")
     const navigate = useNavigate()
     
     useEffect(() => {
-        if(!token && !userId){
+        if(!token || !userId){
             navigate('/login')
+            return
         }
-    })
+
+        if(role !== 'admin'){
+            navigate(-1)
+            return
+        }
+    }, [token, userId, role, navigate])
 
     useEffect(() => {
-        const fetchOverview = async () => {
+        const fetchOrders = async () => {
             try {
                 const res = await fetch(
                     `http://localhost:5001/dashboard/getallorder`,
@@ -41,7 +48,7 @@ export default function OrdersPage() {
             }
         }
 
-        fetchOverview()
+        fetchOrders()
     }, [])
 
     return (

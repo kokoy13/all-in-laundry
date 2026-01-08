@@ -4,5 +4,6 @@ const dashboardController = require("../controllers/dashboardController.js");
 
 router.get("/getoverview", dashboardController.index);
 router.get("/getallorder", dashboardController.getAllOrder);
+router.get("/getallcustomer", dashboardController.getAllCustomer);
 
 module.exports = router;

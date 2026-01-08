@@ -81,10 +81,13 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
                 Status
               </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {paginatedOrders  .map((order) => (
+            {paginatedOrders.map((order) => (
               <tr key={order.id} className="hover:bg-gray-50/50 transition-colors duration-150">
                 <td className="px-6 py-5 text-sm font-medium text-gray-900">{order.id}</td>
                 <td className="px-6 py-5 text-sm text-gray-700">{order.name}</td>
@@ -106,6 +109,11 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
                     <span className="text-xs">{getStatusIcon(order.status)}</span>
                     {getStatusLabel(order.status)}
                   </span>
+                </td>
+                <td className="px-6 flex gap-2 items-center py-5 text-sm">
+                    <button className="hover:underline font-semibold cursor-pointer">View</button>
+                    <button className="hover:underline font-semibold cursor-pointer">Edit</button>
+                    <button className="hover:underline font-semibold cursor-pointer">Delete</button>
                 </td>
               </tr>
             ))}

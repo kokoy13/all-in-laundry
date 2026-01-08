@@ -1,119 +1,23 @@
-"use client"
-
+import { useEffect } from "react"
 import { useState } from "react"
 
-export default function CustomersTable({ searchQuery, sortBy }) {
-  const [customers] = useState([
-    {
-      id: 1,
-      name: "Budi Santoso",
-      phone: "081234567890",
-      email: "budi@email.com",
-      totalOrders: 12,
-      totalSpent: 600000,
-      lastOrder: "Dec 28, 2024",
-      status: "active",
-      joinDate: "Jan 15, 2024",
-    },
-    {
-      id: 2,
-      name: "Siti Nurhaliza",
-      phone: "081987654321",
-      email: "siti@email.com",
-      totalOrders: 8,
-      totalSpent: 280000,
-      lastOrder: "Dec 29, 2024",
-      status: "active",
-      joinDate: "Feb 20, 2024",
-    },
-    {
-      id: 3,
-      name: "Ahmad Wijaya",
-      phone: "082123456789",
-      email: "ahmad@email.com",
-      totalOrders: 15,
-      totalSpent: 1125000,
-      lastOrder: "Dec 30, 2024",
-      status: "active",
-      joinDate: "Jan 5, 2024",
-    },
-    {
-      id: 4,
-      name: "Rina Kusuma",
-      phone: "082456789012",
-      email: "rina@email.com",
-      totalOrders: 6,
-      totalSpent: 300000,
-      lastOrder: "Dec 28, 2024",
-      status: "active",
-      joinDate: "Mar 10, 2024",
-    },
-    {
-      id: 5,
-      name: "Hendra Gunawan",
-      phone: "083567890123",
-      email: "hendra@email.com",
-      totalOrders: 9,
-      totalSpent: 360000,
-      lastOrder: "Dec 29, 2024",
-      status: "active",
-      joinDate: "Feb 5, 2024",
-    },
-    {
-      id: 6,
-      name: "Dewi Lestari",
-      phone: "083456789012",
-      email: "dewi@email.com",
-      totalOrders: 3,
-      totalSpent: 150000,
-      lastOrder: "Dec 27, 2024",
-      status: "inactive",
-      joinDate: "Apr 18, 2024",
-    },
-    {
-      id: 7,
-      name: "Reza Prasetya",
-      phone: "085123456789",
-      email: "reza@email.com",
-      totalOrders: 20,
-      totalSpent: 1400000,
-      lastOrder: "Dec 30, 2024",
-      status: "vip",
-      joinDate: "Jan 1, 2024",
-    },
-    {
-      id: 8,
-      name: "Maya Indraswari",
-      phone: "085987654321",
-      email: "maya@email.com",
-      totalOrders: 11,
-      totalSpent: 550000,
-      lastOrder: "Dec 26, 2024",
-      status: "active",
-      joinDate: "Mar 5, 2024",
-    },
-  ])
+export default function CustomersTable({ searchQuery, customers }) {
+  const [currentPage, setCurrentPage] = useState(1)
+  const recordsPerPage = 5
 
   const filteredCustomers = customers.filter(
     (customer) =>
       customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.phone.includes(searchQuery) ||
       customer.email.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
-  const sortedCustomers = [...filteredCustomers].sort((a, b) => {
-    switch (sortBy) {
-      case "frequent":
-        return b.totalOrders - a.totalOrders
-      case "highest":
-        return b.totalSpent - a.totalSpent
-      case "alphabetical":
-        return a.name.localeCompare(b.name)
-      case "recent":
-      default:
-        return new Date(b.lastOrder) - new Date(a.lastOrder)
-    }
-  })
+  const totalPages = Math.ceil(filteredCustomers.length / recordsPerPage)
+  const startIndex = (currentPage - 1) * recordsPerPage
+  const paginatedCustomers = filteredCustomers.slice(startIndex, startIndex + recordsPerPage)
+
+  useEffect(() => {
+      setCurrentPage(1)
+    }, [searchQuery])
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -134,50 +38,36 @@ export default function CustomersTable({ searchQuery, sortBy }) {
   }
 
   return (
-    <div className="bg-white border border-slate-700 rounded-lg overflow-hidden">
+    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-slate-900/50 border-b border-slate-700">
-            <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Customer Name</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Contact</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Total Orders</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Total Spent</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Last Order</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Status</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Action</th>
+          <thead className="bg-gray-100/50 border-b border-gray-200">
+            <tr className="text-neutral-900">
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">ID</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">Name</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">Email</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">Role</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-700">
-            {sortedCustomers.map((customer) => (
-              <tr key={customer.id} className="hover:bg-slate-800/50 transition-colors">
+            {paginatedCustomers.map((customer) => (
+              <tr key={customer.id} className="hover:bg-gray-200 transition-colors duration-200">
                 <td className="px-6 py-4">
-                  <div className="text-sm font-semibold text-white">{customer.name}</div>
-                  <div className="text-xs text-slate-400">{customer.email}</div>
+                  <div className="text-sm font-semibold">{customer.id}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm text-slate-300">{customer.phone}</div>
+                  <div className="text-sm font-semibold">{customer.name}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm font-semibold text-cyan-400">{customer.totalOrders}</div>
+                  <div className="text-sm">{customer.email}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm font-semibold text-emerald-400">
-                    IDR {(customer.totalSpent / 1000).toLocaleString()}
-                  </div>
+                  <div className={`text-xs w-max px-3 py-0.5 rounded-lg font-semibold capitalize ${customer.role == "admin"?"text-red-500 bg-red-100":"text-blue-500 bg-blue-100"}`}>{customer.role}</div>
                 </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-slate-400">{customer.lastOrder}</div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${getStatusColor(customer.status)}`}>
-                    {getStatusLabel(customer.status)}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm">
-                  <button className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
-                    View Profile
-                  </button>
+                <td className="px-6 py-4 flex gap-3 text-sm items-center">
+                  <button className="hover:underline font-semibold cursor-pointer text-blue-500">Edit</button>
+                  <button className="hover:underline font-semibold cursor-pointer text-red-500">Delete</button>
                 </td>
               </tr>
             ))}
@@ -185,9 +75,52 @@ export default function CustomersTable({ searchQuery, sortBy }) {
         </table>
       </div>
 
-      {sortedCustomers.length === 0 && (
+      {paginatedCustomers.length === 0 && (
         <div className="p-12 text-center">
           <p className="text-slate-400 text-lg">No customers found</p>
+        </div>
+      )}
+
+      {filteredCustomers.length > 0 && (
+        <div className="border-t border-gray-300 px-6 py-4 flex items-center justify-between">
+          <div className="text-sm text-neutral-900">
+            Showing {startIndex + 1}-{Math.min(startIndex + recordsPerPage, filteredCustomers.length)} of{" "}
+            {filteredCustomers.length} customers
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-lg border border-neutral-900 hover:border-blue-600 text-neutral-900 text-sm font-medium hover:bg-blue-500 hover:text-white cursor-pointer duration-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Previous
+            </button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                    currentPage === page
+                      ? "bg-blue-500 text-white border border-blue-600"
+                      : "border border-neutral-900 text-neutral-900 hover:text-white hover:border-blue-600 hover:bg-blue-500"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-lg border border-neutral-900 hover:border-blue-600 text-neutral-900 text-sm font-medium hover:bg-blue-500 hover:text-white cursor-pointer duration-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>

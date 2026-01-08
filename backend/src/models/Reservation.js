@@ -23,6 +23,10 @@ class Reservation{
         return await db.query("SELECT * from orders ORDER BY id")
     }
 
+    static async getAllCustomer(){
+        return await db.query("SELECT id, name, email, role, created_at from users ORDER BY id")
+    }
+
     static async getTotalRevenue(){
         return await db.query("SELECT count(total_amount) as total FROM orders WHERE status = 'completed' ORDER BY id")
     }
