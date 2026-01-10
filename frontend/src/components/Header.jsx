@@ -23,7 +23,7 @@ export default function Header() {
     }else{
       setIsLogin(false)
     }
-  }, )
+  }, [token, userId, role])
 
   const handleDropdownToggle = () => {
     setIsDropdownOpen(!isDropdownOpen)

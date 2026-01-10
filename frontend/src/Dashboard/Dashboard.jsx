@@ -19,13 +19,13 @@ export default function Dashboard() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        if(!token || !userId){
-            navigate('/login')
+        if (!token || !userId) {
+            navigate("/login", { replace: true })
             return
         }
 
-        if(role !== 'admin'){
-            navigate(-1)
+        if (role !== "admin") {
+            navigate("/", { replace: true })
             return
         }
     }, [token, userId, role, navigate])

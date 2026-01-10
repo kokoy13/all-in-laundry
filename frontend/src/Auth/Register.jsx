@@ -17,10 +17,10 @@ export default function Register() {
     const role = localStorage.getItem("role")
 
     useEffect(() => {
-        if(token && userId && role){
-            navigate(-1)
-        }
-    },)
+    if (token && userId && role) {
+        navigate("/", { replace: true })
+    }
+    }, [token, userId, role, navigate])
 
     const handleChange = (e) => {
         const { name, value } = e.target

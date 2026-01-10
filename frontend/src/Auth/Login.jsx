@@ -11,13 +11,18 @@ export default function Login() {
     })
     const token = localStorage.getItem("token")
     const userId = localStorage.getItem("id")
+    const role = localStorage.getItem("role")
     const navigate = useNavigate()
 
     useEffect(() => {
-        if(token && userId){
-            navigate(-1)
+    if (token && userId && role) {
+        if (role === "admin") {
+        navigate("/dashboard", { replace: true })
+        } else {
+        navigate("/", { replace: true })
         }
-    },)
+    }
+    }, [token, userId, role, navigate])
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -48,9 +53,11 @@ export default function Login() {
             localStorage.setItem("id", data.id);
             localStorage.setItem("role", data.role)
 
+            console.log("ROLE FROM API:", data.role, typeof data.role);
+            const role = data.role?.trim().toLowerCase();
             setMessage(data.message);
 
-            if (data.role === "admin") {
+            if (role === "admin") {
                 navigate("/dashboard");
             } else {
                 navigate("/");
