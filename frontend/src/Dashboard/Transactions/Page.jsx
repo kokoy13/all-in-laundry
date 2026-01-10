@@ -27,26 +27,26 @@ export default function TransactionsPage() {
         }
     }, [token, userId, role, navigate])
 
-    useEffect(() => {
-        const fetchTransaction = async () => {
-            try {
-                const res = await fetch(
-                    "http://localhost:5001/dashboard/getalltransaction",
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                )
+    const fetchTransaction = async () => {
+        try {
+            const res = await fetch(
+                "http://localhost:5001/dashboard/getalltransaction",
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
 
-                const data = await res.json()
-                setTransactions(data.transactions)
-            } catch (error) {
-                console.error(error.message)
-            }
+            const data = await res.json()
+            setTransactions(data.transactions)
+        } catch (error) {
+            console.error(error.message)
         }
+    }
 
+    useEffect(() => {
         fetchTransaction()
     }, [])
 
@@ -64,7 +64,7 @@ export default function TransactionsPage() {
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
                     />
-                    <TransactionsTable transactions={transactions} searchQuery={searchQuery} />
+                    <TransactionsTable fetchTransaction={fetchTransaction} transactions={transactions} searchQuery={searchQuery} />
                 </div>
             </main>
         </div>

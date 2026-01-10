@@ -4,7 +4,6 @@ import DashboardSidebar from "../components/Dashboard/DashboardSidebar"
 import OverviewStats from "../components/Dashboard/OverviewStats"
 import RecentOrders from "../components/Dashboard/RecentOrders"
 import { useNavigate } from "react-router-dom"
-import { use } from "react"
 
 export default function Dashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -12,7 +11,7 @@ export default function Dashboard() {
     const userId = localStorage.getItem("id")
     const role = localStorage.getItem("role")
     const [totalOrder, setTotalOrder] = useState("")
-    const [revenue, setRevenue] = useState("")
+    const [revenue, setRevenue] = useState(0)
     const [completedOrder, setCompletedOrder] = useState("")
     const [progressOrder, setProgressOrder] = useState("")
     const [recentOrders, setRecentOrders] = useState([])

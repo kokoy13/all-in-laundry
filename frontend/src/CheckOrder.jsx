@@ -163,6 +163,7 @@ export default function CheckOrder() {
                             ? "Selesai"
                             : "Dibatalkan"}
                       </span>
+                      <span>{order.status === "completed" ? "Pesanan sudah selesai dan bisa dijemput":""}</span>
                     </div>
                     <p className="text-slate-700 font-semibold text-base">{order.name}</p>
                   </div>

@@ -28,26 +28,26 @@ export default function OrdersPage() {
         }
     }, [token, userId, role, navigate])
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const res = await fetch(
-                    `http://localhost:5001/dashboard/getallorder`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                )
+    const fetchOrders = async () => {
+        try {
+            const res = await fetch(
+                `http://localhost:5001/dashboard/getallorder`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
 
-                const data = await res.json()
-                setOrders(data.orders)
-            } catch (error) {
-                console.error(error.message)
-            }
+            const data = await res.json()
+            setOrders(data.orders)
+        } catch (error) {
+            console.error(error.message)
+        }
         }
 
+    useEffect(() => {
         fetchOrders()
     }, [])
 
@@ -68,7 +68,7 @@ export default function OrdersPage() {
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
                     />
-                    <OrdersTable orders={orders} filterStatus={filterStatus} searchQuery={searchQuery} />
+                    <OrdersTable fetchOrders={fetchOrders} orders={orders} filterStatus={filterStatus} searchQuery={searchQuery} />
                 </div>
             </div>
             </main>

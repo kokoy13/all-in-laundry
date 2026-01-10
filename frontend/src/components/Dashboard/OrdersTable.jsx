@@ -1,9 +1,11 @@
 import { useEffect } from "react"
 import { useState } from "react"
 import { Check, X } from "lucide-react"
+import {toast, Toaster} from "react-hot-toast"
 
-export default function OrdersTable({ orders, filterStatus, searchQuery }) {
+export default function OrdersTable({ fetchOrders, orders, filterStatus, searchQuery }) {
   const [currentPage, setCurrentPage] = useState(1)
+  const [selectedRemove, setSelectedRemove] = useState(null)
   const recordsPerPage = 5
 
   const getStatusIcon = (status) => {
@@ -56,18 +58,56 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
     }
   }
 
-  const handleClick = async(condition) =>{
-    if(condition === "approve"){
-      console.log("setuju")
-    }else if(condition === "disapprove"){
-      console.log("ndak setuju")
+  const getAction = (status) =>{
+    if(status == "completed" || status == "cancelled"){
+      return "hidden"
+    }
+  }
+
+  const handleClick = async(condition, order_id) =>{
+    if(condition === "approve" || condition === "disapprove"){
+      try {
+          const res = await fetch("http://localhost:5001/dashboard/setorderstatus",{
+              method: "POST",
+              headers: {"Content-Type":"application/json"},
+              body: JSON.stringify({order_id, condition})
+          })
+          
+          const data = await res.json()
+          if(!res.ok){
+              toast.error(data.message)
+          }else{
+            toast.success(data.message)
+            fetchOrders()
+          } 
+      } catch (error) {
+          toast.error(`Error : ${error}`)
+      }
     }else if(condition === "remove"){
-      console.log("hapus")
+      try {
+        const res = await fetch("http://localhost:5001/dashboard/removeorder",{
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({order_id})
+        })
+          setSelectedRemove(null)
+          
+          const data = await res.json()
+          if(!res.ok){
+              toast.error(data.message)
+          }else{
+            toast.success(data.message)
+            fetchOrders()
+          } 
+        } catch (error) {
+            toast.error(`Error : ${error}`)
+        }
     }
   }
 
   return (
     <div className="rounded-lg overflow-hidden">
+      <Toaster position="top-center"></Toaster>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -79,7 +119,7 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
                 Customer
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
-                Service
+                Service ID
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
                 Quantity
@@ -105,7 +145,7 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
                 <td className="px-6 py-5 text-sm text-gray-900 font-semibold">
                   Rp {order.total_amount.toLocaleString()}
                 </td>
-                <td className="px-6 py-5 text-sm">
+                <td className="px-6 py-5 text-sm capitalize">
                   <span
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                       getStatusColor(order.status)
@@ -116,13 +156,15 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
                   </span>
                 </td>
                 <td className="px-6 flex gap-2 items-center py-5 text-sm">
-                    <button onClick={handleClick("approve")}  className="cursor-pointer">
+                    <div className={`flex gap-2 items-center ${getAction(order.status)}`}>
+                      <button onClick={() => handleClick("approve", order.id)}  className="cursor-pointer">
                       <Check className="w-5 h-5 text-green-500 hover:text-green-600"/>
-                    </button>
-                    <button onClick={handleClick("disapprove")} className="cursor-pointer">
-                      <X className="w-5 h-5 text-red-500 hover:text-red-600"/>
-                    </button>
-                    <button onClick={handleClick("remove")} className="hover:underline font-semibold cursor-pointer text-red-500">Delete</button>
+                      </button>
+                      <button onClick={() => handleClick("disapprove", order.id)} className="cursor-pointer">
+                        <X className="w-5 h-5 text-red-500 hover:text-red-600"/>
+                      </button>
+                    </div>
+                    <button onClick={() => setSelectedRemove(order.id)} className="hover:underline font-semibold cursor-pointer text-red-500">Delete</button>
                 </td>
               </tr>
             ))}
@@ -178,6 +220,52 @@ export default function OrdersTable({ orders, filterStatus, searchQuery }) {
           </div>
         </div>
       )}
+
+  {/* Order Detail Modal */}
+  {selectedRemove && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 animate-in fade-in zoom-in-95 duration-300">
+      
+      {/* Header */}
+      <div className="flex items-start gap-4 mb-4">
+        <div className="flex-1 flex flex-col gap-5 items-center">
+          <h2 className="text-xl font-bold text-slate-900">
+            Hapus Order 
+          </h2>
+          <p className="text-sm text-slate-600 mt-1 text-center">
+            Tindakan ini <span className="font-semibold text-red-600">tidak dapat dibatalkan</span>.
+            Apakah Anda yakin ingin menghapus pesanan ini?
+          </p>
+        </div>
+        <button
+          onClick={() => setSelectedRemove(null)}
+          className="text-slate-400 hover:text-slate-600 text-xl cursor-pointer"
+        >
+          ×
+        </button>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-3 mt-6">
+        <button
+          onClick={() => setSelectedRemove(null)}
+          className="w-full cursor-pointer px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition font-medium"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => handleClick("remove", selectedRemove)}
+          className="w-full cursor-pointer px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition font-bold"
+        >
+          Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
     </div>
   )
 }

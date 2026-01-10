@@ -9,7 +9,8 @@ export default function OverviewStats({ totalOrder, revenue, completedOrder, pro
     },
     {
       label: "Revenue",
-      value: `Rp ${revenue?.toLocaleString("id-ID") || "0"}`,
+      prefix: 'Rp ',
+      value: revenue,
       icon: "💰",
       unit: "total",
       bgColor: "bg-gradient-to-br from-yellow-300 to-yellow-400",
@@ -40,7 +41,10 @@ export default function OverviewStats({ totalOrder, revenue, completedOrder, pro
           <div className="flex items-start justify-between mb-4">
             <div className="text-gray-500 text-sm font-medium uppercase tracking-wide">{stat.label}</div>
           </div>
-          <p className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</p>
+          <p className="text-3xl font-bold text-gray-900 mb-2">
+            {stat.prefix}
+            {stat.value.toLocaleString("id-ID")}
+          </p>
           <div className="text-xs text-gray-600">{stat.unit}</div>
         </div>
       ))}

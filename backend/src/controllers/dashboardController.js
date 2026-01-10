@@ -22,6 +22,49 @@ exports.index = async(req, res) =>{
     }
 }
 
+exports.removeOrder = async(req, res) =>{
+    const {order_id} = req.body
+
+    try {
+        await Reservation.removeOrder(order_id)
+        return res.status(200).json({
+            message: "Berhasil menghapus order"
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: `Error ${error}`
+        })
+    }
+}
+
+exports.setOrderStatus = async(req, res) =>{
+    const {order_id, condition} = req.body
+    try {
+        const orders = await Reservation.setOrderStatus(order_id, condition)
+        return res.status(200).json({
+            message: orders
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: `Error ${error}`
+        })
+    }
+}
+
+exports.setTransactionStatus = async(req, res) =>{
+    const {transaction_id, condition} = req.body
+    try {
+        const transactions = await Reservation.setTransactionStatus(transaction_id, condition)
+        return res.status(200).json({
+            message: transactions
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: `Error ${error}`
+        })
+    }
+}
+
 exports.getAllOrder = async(req, res) =>{
     try {
         const orders = await Reservation.getAllOrder()

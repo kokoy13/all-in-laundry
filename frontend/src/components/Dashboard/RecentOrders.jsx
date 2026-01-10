@@ -10,6 +10,19 @@ export default function RecentOrders({ recentOrders }) {
     }
   }
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-50 text-green-600 border-green-600"
+      case "progress":
+        return "bg-blue-50 text-blue-600 border-blue-600"
+      case "cancelled":
+        return "bg-red-50 text-red-600 border-red-600"
+      default:
+        return "bg-slate-700/20 text-slate-300"
+    }
+  }
+
   const getStatusLabel = (status) => {
     switch (status) {
       case "completed":
@@ -62,14 +75,10 @@ export default function RecentOrders({ recentOrders }) {
                 <td className="px-6 py-5 text-sm text-gray-900 font-semibold">
                   Rp {order.total_amount.toLocaleString()}
                 </td>
-                <td className="px-6 py-5 text-sm">
+                <td className="px-6 py-5 text-sm capitalize">
                   <span
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                      order.status === "completed"
-                        ? "bg-gray-100 text-gray-700"
-                        : order.status === "progress"
-                          ? "bg-blue-50 text-blue-700"
-                          : "bg-gray-100 text-gray-600"
+                      getStatusColor(order.status)
                     }`}
                   >
                     <span className="text-xs">{getStatusIcon(order.status)}</span>
